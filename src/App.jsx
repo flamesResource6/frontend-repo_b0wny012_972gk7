@@ -15,7 +15,6 @@ function App() {
   };
 
   const handlePay = () => {
-    // Simulasi pembayaran instan
     setCartOpen(false);
     setTimeout(() => {
       alert(`Pembayaran berhasil! Total: Rp ${total.toLocaleString('id-ID')}`);
