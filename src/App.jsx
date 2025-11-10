@@ -1,72 +1,68 @@
 import React, { useMemo, useState } from 'react';
 import Navbar from './components/Navbar';
-import Hero from './components/Hero';
+import HeroSection from './components/HeroSection';
 import BookGrid from './components/BookGrid';
-import CartPanel from './components/CartPanel';
-import PaymentModal from './components/PaymentModal';
+import Checkout from './components/Checkout';
 
 function App() {
-  const [openCart, setOpenCart] = useState(false);
-  const [search, setSearch] = useState('');
-  const [items, setItems] = useState([]);
-  const [payOpen, setPayOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cart, setCart] = useState([]);
+  const total = useMemo(() => cart.reduce((s, it) => s + it.price, 0), [cart]);
 
-  const total = useMemo(() => items.reduce((s, i) => s + i.price, 0), [items]);
+  const handleAdd = (book) => {
+    setCart((c) => [...c, book]);
+  };
 
-  const addToCart = (book) => setItems((prev) => [...prev, book]);
-  const removeFromCart = (idx) => setItems((prev) => prev.filter((_, i) => i !== idx));
-  const checkout = () => {
-    setOpenCart(false);
-    setTimeout(() => setPayOpen(true), 300);
+  const handlePay = () => {
+    // Simulasi pembayaran instan
+    setCartOpen(false);
+    setTimeout(() => {
+      alert(`Pembayaran berhasil! Total: Rp ${total.toLocaleString('id-ID')}`);
+      setCart([]);
+    }, 400);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950">
-      <Navbar onCartOpen={() => setOpenCart(true)} cartCount={items.length} onSearch={setSearch} />
-      <Hero />
-      <BookGrid query={search} onAdd={addToCart} />
+    <div className="min-h-screen bg-black">
+      <Navbar onCartOpen={() => setCartOpen(true)} cartCount={cart.length} onSearch={setQuery} />
+      <HeroSection />
+      <BookGrid query={query} onAdd={handleAdd} />
 
-      <section id="why" className="relative py-16 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(236,72,153,0.15),transparent_40%),radial-gradient(circle_at_90%_30%,rgba(34,211,238,0.15),transparent_40%)]" />
-        <div className="relative max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-6">
-          {[
-            {
-              title: 'AI Rekomendasi',
-              desc: 'Saran buku personal sesuai selera bacaan Anda. Masa depan kurasi.',
-            },
-            {
-              title: 'Pembayaran Aman',
-              desc: 'Jalur pembayaran terenkripsi dengan simulasi checkout mulus.',
-            },
-            {
-              title: 'Pengalaman Imersif',
-              desc: 'Animasi halus, 3D interaktif, dan desain futuristik 2050.',
-            },
-          ].map((f, i) => (
-            <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <h3 className="text-xl font-semibold mb-2">{f.title}</h3>
-              <p className="text-white/70">{f.desc}</p>
+      <footer className="relative py-10 bg-slate-950 text-white/70">
+        <div className="max-w-7xl mx-auto px-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div>
+            <div className="text-white font-semibold">NovaBooks</div>
+            <p className="text-white/60 mt-2 text-sm">Toko buku futuristik dengan kurasi AI dan pembayaran kilat.</p>
+          </div>
+          <div>
+            <div className="text-white font-semibold mb-2">Bantuan</div>
+            <ul className="space-y-1 text-sm">
+              <li>Pusat Bantuan</li>
+              <li>Pengiriman</li>
+              <li>Kebijakan Privasi</li>
+            </ul>
+          </div>
+          <div>
+            <div className="text-white font-semibold mb-2">Kategori</div>
+            <ul className="space-y-1 text-sm">
+              <li>Fiksi Ilmiah</li>
+              <li>Bisnis</li>
+              <li>Teknologi</li>
+            </ul>
+          </div>
+          <div>
+            <div className="text-white font-semibold mb-2">Newsletter</div>
+            <div className="flex items-center gap-2">
+              <input placeholder="Email Anda" className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none" />
+              <button className="bg-gradient-to-r from-fuchsia-500 to-cyan-500 px-4 py-2 rounded-xl font-semibold">Kirim</button>
             </div>
-          ))}
+          </div>
         </div>
-      </section>
-
-      <footer className="border-t border-white/10 text-white/70 py-10">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p>© {new Date().getFullYear()} NovaBooks — Toko buku era 2050.</p>
-          <div className="text-xs">Made with love and photons ✨</div>
-        </div>
+        <div className="mt-8 text-center text-xs text-white/50">© {new Date().getFullYear()} NovaBooks. All rights reserved.</div>
       </footer>
 
-      <CartPanel 
-        open={openCart} 
-        items={items} 
-        onClose={() => setOpenCart(false)} 
-        onRemove={removeFromCart} 
-        onCheckout={checkout} 
-      />
-
-      <PaymentModal open={payOpen} total={total} onClose={() => setPayOpen(false)} />
+      <Checkout open={cartOpen} onClose={() => setCartOpen(false)} items={cart} onPay={handlePay} />
     </div>
   );
 }
